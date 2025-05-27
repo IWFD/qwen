@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Transações - Bugend Bank</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Histórico de Transações</h2>
+      <button class="back" onclick="goBack()">← Voltar</button>
+    </div>
+
+    <div id="transactions-list"></div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script>
+    window.onload = () => {
+      loadTransactions();
+    };
+  </script>
+</body>
+</html>

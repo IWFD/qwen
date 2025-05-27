@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Perfil - Bugend Bank</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Seu Perfil</h2>
+      <button onclick="goBack()">← Voltar</button>
+    </div>
+
+    <p><strong>Nome:</strong> <span id="user-name">Carregando...</span></p>
+    <p><strong>E-mail:</strong> <span id="user-email">Carregando...</span></p>
+    <p><strong>ID:</strong> <span id="user-id">Carregando...</span></p>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script>
+    window.onload = () => {
+      const claraUser = JSON.parse(localStorage.getItem('claraUser'));
+      if (claraUser && claraUser.user) {
+        document.getElementById('user-name').innerText = claraUser.user.name || 'Não disponível';
+        document.getElementById('user-email').innerText = claraUser.user.email || 'Não disponível';
+        document.getElementById('user-id').innerText = claraUser.user.id || 'Não disponível';
+      } else {
+        document.getElementById('user-name').innerText = 'Dados não encontrados';
+      }
+    };
+  </script>
+</body>
+</html>
