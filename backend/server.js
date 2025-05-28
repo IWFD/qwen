@@ -41,7 +41,7 @@ function getBasicAuthHeader() {
 async function getClaraToken(assertion) {
   try {
     const response = await axios.post(
-      'https://public-api.br.clara.com/oauth/token',
+      'https://public-api.br.clara.com/oauth/token ',
       new URLSearchParams({
         grant_type: 'client_credentials',
         client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
@@ -98,7 +98,7 @@ app.get('/api/cards', async (req, res) => {
     const accessToken = await getClaraToken(assertion);
 
     const cardsRes = await axios.get(
-      'https://public-api.br.clara.com/api/v3/cards',
+      'https://public-api.br.clara.com/api/v3/cards ',
       {
         headers: {
           accept: 'application/json',
@@ -120,8 +120,11 @@ app.get('/api/users', async (req, res) => {
     const assertion = generateAssertion();
     const accessToken = await getClaraToken(assertion);
 
+    console.log('📡 Fazendo GET para:', 'https://public-api.br.clara.com/api/v2/users ');
+    console.log('🔑 Token usado:', accessToken);
+
     const usersRes = await axios.get(
-      'https://public-api.br.clara.com/api/v2/users',
+      'https://public-api.br.clara.com/api/v2/users ',
       {
         headers: {
           accept: 'application/json',
@@ -133,6 +136,9 @@ app.get('/api/users', async (req, res) => {
     res.json(usersRes.data);
   } catch (error) {
     console.error('❌ Erro ao buscar usuários:', error.message);
+    if (error.response) {
+      console.error('Detalhes:', error.response.status, error.response.data);
+    }
     res.status(500).json({ error: 'Erro ao buscar colaboradores' });
   }
 });
