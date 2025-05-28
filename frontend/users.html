@@ -18,8 +18,22 @@
   <script src="../js/main.js"></script>
   <script>
     window.onload = () => {
-      fetch('https://qwen-tgud.onrender.com/api/users ')
-        .then(res => res.json())
+      const url = 'https://qwen-tgud.onrender.com/api/users ';
+
+      fetch(url)
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
+
+          // Verifica se é JSON antes de parsear
+          const contentType = res.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('A resposta não é um JSON válido');
+          }
+
+          return res.json();
+        })
         .then(data => {
           const container = document.getElementById('users-list');
           container.innerHTML = '';
@@ -40,7 +54,7 @@
           }
         })
         .catch(err => {
-          console.error('Erro ao carregar usuários:', err);
+          console.error('🚨 Erro ao carregar usuários:', err.message);
           document.getElementById('users-list').innerText = 'Erro ao carregar colaboradores.';
         });
     };
