@@ -1,4 +1,4 @@
-require ('dotenv').config();
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -6,12 +6,12 @@ const morgan = require('morgan');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const axios = require('axios');
-
-// Carregar Certificado e Chave Privada
-const privateKey = fs.readFileSync(process.env.PRIVATE_KEY_PATH);
+const { Buffer } = require('buffer');
 
 // Carregar configurações do .env
-  const tokenData = {
+const privateKey = fs.readFileSync(process.env.PRIVATE_KEY_PATH);
+
+const tokenData = {
   clientId: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
   audience: process.env.AUDIENCE?.trim()
@@ -37,7 +37,7 @@ function getBasicAuthHeader() {
   return `Basic ${Buffer.from(auth).toString('base64')}`;
 }
 
-// Função para obter token da Clara
+// Função reutilizável pra pegar token da Clara
 async function getClaraToken(assertion) {
   try {
     const response = await axios.post(
@@ -65,17 +65,20 @@ async function getClaraToken(assertion) {
   }
 }
 
+// Iniciar servidor
 const app = express();
 
 // Configurar CORS
 const corsOptions = {
-  origin: '*',
+  origin: '*'
 };
 app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(helmet());
 app.use(morgan('dev'));
+
+// ========== ROTAS DA API DEVEM VIR ANTES DE SERVIR O FRONTEND ==========
 
 // Rota: Obter token da Clara
 app.get('/api/auth/token', async (req, res) => {
@@ -94,44 +97,50 @@ app.get('/api/cards', async (req, res) => {
     const assertion = generateAssertion();
     const accessToken = await getClaraToken(assertion);
 
-    const cardsRes = await axios.get('https://public-api.br.clara.com/api/v3/cards ', {
-      headers: {
-        accept: 'application/json',
-        authorization: `Bearer ${accessToken}`
+    const cardsRes = await axios.get(
+      'https://public-api.br.clara.com/api/v3/cards ',
+      {
+        headers: {
+          accept: 'application/json',
+          authorization: `Bearer ${accessToken}`
+        }
       }
-    });
+    );
 
-    res.json(cardsRes.data); // Retorna dados reais dos cartões
+    res.json(cardsRes.data);
   } catch (error) {
     console.error('❌ Erro ao buscar cartões:', error.message);
     res.status(500).json({ error: 'Erro ao buscar cartões' });
   }
 });
 
-// Rota de buscar usuários
+// Rota: Buscar todos os usuários
 app.get('/api/users', async (req, res) => {
   try {
     const assertion = generateAssertion();
     const accessToken = await getClaraToken(assertion);
 
-    const usersRes = await axios.get('https://public-api.br.clara.com/api/v2/users ', {
-      headers: {
-        accept: 'application/json',
-        authorization: `Bearer ${accessToken}`
+    const usersRes = await axios.get(
+      'https://public-api.br.clara.com/api/v2/users ',
+      {
+        headers: {
+          accept: 'application/json',
+          authorization: `Bearer ${accessToken}`
+        }
       }
-    });
+    );
 
     res.json(usersRes.data);
   } catch (error) {
-    console.error('Erro ao buscar usuários:', error.message);
-    res.status(500).json({ error: 'Erro ao buscar usuários' });
+    console.error('❌ Erro ao buscar usuários:', error.message);
+    res.status(500).json({ error: 'Erro ao buscar colaboradores' });
   }
 });
-//Fim da rota de buscar usuários
 
-// SERVIR FRONTEND POR ÚLTIMO
+// ========== SERVIR FRONTEND POR ÚLTIMO ==========
 app.use(express.static('../frontend'));
 
+// Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Backend rodando em http://localhost:${PORT}`);
