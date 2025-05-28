@@ -12,7 +12,7 @@
       <button onclick="goBack()">← Voltar</button>
     </div>
 
-    <div id="users-list">Carregando...</div>
+    <div id="users-list">Carregando colaboradores...</div>
   </div>
 
   <script src="../js/main.js"></script>
@@ -40,8 +40,8 @@
           }
         })
         .catch(err => {
-          document.getElementById('users-list').innerText = 'Erro ao carregar usuários.';
-          console.error(err);
+          console.error('Erro ao carregar usuários:', err);
+          document.getElementById('users-list').innerText = 'Erro ao carregar colaboradores.';
         });
     };
   </script>
