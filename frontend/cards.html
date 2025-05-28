@@ -1,6 +1,25 @@
-<div id="cards-list"></div>
-<script>
-  window.onload = () => {
-    loadCards();
-  };
-</script>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cartões - Bugend Bank</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Seus Cartões</h2>
+      <button onclick="goBack()">← Voltar</button>
+    </div>
+
+    <div id="cards-list">Carregando...</div>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script>
+    window.onload = () => {
+      loadCards();
+    };
+  </script>
+</body>
+</html>

@@ -1,17 +1,13 @@
-require ('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const axios = require('axios');
-
-// Carregar Certificado e Chave Privada
-const privateKey = fs.readFileSync(process.env.PRIVATE_KEY_PATH);
+const { Buffer } = require('buffer');
 
 // Carregar configurações do .env
-  const tokenData = {
+const privateKey = fs.readFileSync(process.env.PRIVATE_KEY_PATH);
+
+const tokenData = {
   clientId: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
   audience: process.env.AUDIENCE?.trim()
@@ -45,7 +41,7 @@ async function getClaraToken(assertion) {
       new URLSearchParams({
         grant_type: 'client_credentials',
         client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-        client_assertion: assertion || generateAssertion()
+        client_assertion: assertion
       }),
       {
         headers: {
@@ -57,61 +53,45 @@ async function getClaraToken(assertion) {
 
     return response.data.access_token;
   } catch (error) {
-    console.error('❌ Erro ao obter token:', error.message);
+    console.error('❌ Erro ao obter token da Clara:', error.message);
     if (error.response) {
       console.error('Detalhes:', error.response.data);
     }
-    throw error;
+    return null;
   }
 }
 
-const app = express();
-
-// Configurar CORS
-const corsOptions = {
-  origin: '*',
-};
-app.use(cors(corsOptions));
-
-app.use(express.json());
-app.use(helmet());
-app.use(morgan('dev'));
-
-// Rota: Obter token da Clara
-app.get('/api/auth/token', async (req, res) => {
+// Função para buscar cartões na API Clara
+async function testCardsApi(token) {
   try {
-    const assertion = generateAssertion();
-    const accessToken = await getClaraToken(assertion);
-    res.json({ access_token: accessToken });
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao obter token da Clara' });
-  }
-});
-
-// Rota: Buscar todos os cartões
-app.get('/api/cards', async (req, res) => {
-  try {
-    const assertion = generateAssertion();
-    const accessToken = await getClaraToken(assertion);
-
-    const cardsRes = await axios.get('https://public-api.br.clara.com/api/v3/cards ', {
+    const res = await axios.get('https://public-api.br.clara.com/api/v3/cards ', {
       headers: {
         accept: 'application/json',
-        authorization: `Bearer ${accessToken}`
+        authorization: `Bearer ${token}`
       }
     });
 
-    res.json(cardsRes.data); // Retorna dados reais dos cartões
+    console.log('✅ Cartões encontrados:', res.data);
   } catch (error) {
     console.error('❌ Erro ao buscar cartões:', error.message);
-    res.status(500).json({ error: 'Erro ao buscar cartões' });
+    if (error.response) {
+      console.error('Detalhes:', error.response.data);
+    }
   }
-});
+}
 
-// SERVIR FRONTEND POR ÚLTIMO
-app.use(express.static('../frontend'));
+// Rodar o teste
+(async () => {
+  console.log('🔐 Gerando assertion JWT...');
+  const assertion = generateAssertion();
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Backend rodando em http://localhost:${PORT}`);
-});
+  console.log('🔑 Obtendo token da Clara...');
+  const accessToken = await getClaraToken(assertion);
+
+  if (accessToken) {
+    console.log('🟢 Token obtido com sucesso!');
+    await testCardsApi(accessToken);
+  } else {
+    console.log('🔴 Falha ao obter token. Verifique suas credenciais.');
+  }
+})();
