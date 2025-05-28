@@ -41,7 +41,7 @@ async function getClaraToken(assertion) {
       new URLSearchParams({
         grant_type: 'client_credentials',
         client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-        client_assertion: assertion
+        client_assertion: assertion || generateAssertion()
       }),
       {
         headers: {
@@ -64,7 +64,7 @@ async function getClaraToken(assertion) {
 // Função para buscar cartões na API Clara
 async function testCardsApi(token) {
   try {
-    const res = await axios.get('https://public-api.br.clara.com/api/v3/cards ', {
+    const res = await axios.get('https://public-api.br.clara.com/api/v3/cards', {
       headers: {
         accept: 'application/json',
         authorization: `Bearer ${token}`
@@ -90,6 +90,9 @@ async function testCardsApi(token) {
 
   if (accessToken) {
     console.log('🟢 Token obtido com sucesso!');
+    console.log('🔑 Access Token:', accessToken); // Mostra o token pra você usar no Postman
+
+    console.log('💳 Buscando cartões...'); // Log adicional
     await testCardsApi(accessToken);
   } else {
     console.log('🔴 Falha ao obter token. Verifique suas credenciais.');

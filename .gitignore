@@ -1,0 +1,7 @@
+/backend/.env
+/backend/private-key.key
+/backend/public-key.crt
+/node_modules
+.DS_Store
+*.log
+npm-debug.log*
