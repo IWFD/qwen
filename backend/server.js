@@ -41,7 +41,7 @@ function getBasicAuthHeader() {
 async function getClaraToken(assertion) {
   try {
     const response = await axios.post(
-      'https://public-api.br.clara.com/oauth/token ',
+      'https://public-api.br.clara.com/oauth/token',
       new URLSearchParams({
         grant_type: 'client_credentials',
         client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
@@ -98,7 +98,7 @@ app.get('/api/cards', async (req, res) => {
     const accessToken = await getClaraToken(assertion);
 
     const cardsRes = await axios.get(
-      'https://public-api.br.clara.com/api/v3/cards ',
+      'https://public-api.br.clara.com/api/v3/cards',
       {
         headers: {
           accept: 'application/json',
@@ -121,7 +121,7 @@ app.get('/api/users', async (req, res) => {
     const accessToken = await getClaraToken(assertion);
 
     const usersRes = await axios.get(
-      'https://public-api.br.clara.com/api/v2/users ',
+      'https://public-api.br.clara.com/api/v2/users',
       {
         headers: {
           accept: 'application/json',
