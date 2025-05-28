@@ -1,6 +1,4 @@
 {
-  "rootDirectory": "frontend",
-  "build": {
-    "env": {}
-  }
+  "outputDirectory": "frontend",
+  "framework": "html"
 }
