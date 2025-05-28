@@ -64,18 +64,25 @@ async function getClaraToken(assertion) {
 // Função para buscar cartões na API Clara
 async function testCardsApi(token) {
   try {
-    const res = await axios.get('https://public-api.br.clara.com/api/v3/cards', {
-      headers: {
-        accept: 'application/json',
-        authorization: `Bearer ${token}`
+    const res = await axios.get(
+      'https://public-api.br.clara.com/api/v3/cards ', // Corrigido pra v3 e sem espaço
+      {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`,
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7'
+        }
       }
-    });
+    );
 
+    console.log('🟢 Status:', res.status);
     console.log('✅ Cartões encontrados:', res.data);
   } catch (error) {
-    console.error('❌ Erro ao buscar cartões:', error.message);
     if (error.response) {
-      console.error('Detalhes:', error.response.data);
+      console.error('🔴 Erro detalhado:', error.response.status, error.response.data);
+    } else {
+      console.error('❌ Erro geral:', error.message);
     }
   }
 }
@@ -90,8 +97,6 @@ async function testCardsApi(token) {
 
   if (accessToken) {
     console.log('🟢 Token obtido com sucesso!');
-    console.log('🔑 Access Token:', accessToken); // Mostra o token pra você usar no Postman
-
     console.log('💳 Buscando cartões...'); // Log adicional
     await testCardsApi(accessToken);
   } else {

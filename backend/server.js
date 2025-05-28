@@ -108,6 +108,27 @@ app.get('/api/cards', async (req, res) => {
   }
 });
 
+// Rota de buscar usuários
+app.get('/api/users', async (req, res) => {
+  try {
+    const assertion = generateAssertion();
+    const accessToken = await getClaraToken(assertion);
+
+    const usersRes = await axios.get('https://public-api.br.clara.com/api/v2/users ', {
+      headers: {
+        accept: 'application/json',
+        authorization: `Bearer ${accessToken}`
+      }
+    });
+
+    res.json(usersRes.data);
+  } catch (error) {
+    console.error('Erro ao buscar usuários:', error.message);
+    res.status(500).json({ error: 'Erro ao buscar usuários' });
+  }
+});
+//Fim da rota de buscar usuários
+
 // SERVIR FRONTEND POR ÚLTIMO
 app.use(express.static('../frontend'));
 
