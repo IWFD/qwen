@@ -1,4 +1,4 @@
 {
-  "outputDirectory": "frontend",
-  "framework": "html"
-}
+   "framework": "html",
+  "outputDirectory": "frontend"
+ }
