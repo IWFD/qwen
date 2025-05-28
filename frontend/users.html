@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Usuários - Bugend Bank</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Colaboradores</h2>
+      <button onclick="goBack()">← Voltar</button>
+    </div>
+
+    <div id="users-list">Carregando...</div>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script>
+    window.onload = () => {
+      fetch('https://qwen-tgud.onrender.com/api/users ')
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById('users-list');
+          container.innerHTML = '';
+
+          if (data.content && data.content.length > 0) {
+            data.content.forEach(user => {
+              const div = document.createElement('div');
+              div.className = 'user-card';
+              div.innerHTML = `
+                <strong>${user.fullName}</strong><br/>
+                <small>${user.username}</small><br/>
+                <em>Status:</em> ${user.status || 'N/A'}<hr/>
+              `;
+              container.appendChild(div);
+            });
+          } else {
+            container.innerText = 'Nenhum usuário encontrado.';
+          }
+        })
+        .catch(err => {
+          document.getElementById('users-list').innerText = 'Erro ao carregar usuários.';
+          console.error(err);
+        });
+    };
+  </script>
+</body>
+</html>
