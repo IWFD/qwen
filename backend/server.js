@@ -8,7 +8,7 @@ const fs = require('fs');
 const axios = require('axios');
 const { Buffer } = require('buffer');
 
-// Carregar configurações do .env
+// Validar configurações iniciais
 if (!process.env.PRIVATE_KEY_PATH) {
   throw new Error('PRIVATE_KEY_PATH não está definido no .env');
 }
@@ -39,12 +39,13 @@ async function getClaraToken() {
       new URLSearchParams({
         grant_type: 'client_credentials',
         audience: tokenData.audience,
-        scope: 'read:users read:cards' // Se necessário, remova se não funcionar
+        scope: 'read:users read:cards'
       }),
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': getBasicAuthHeader()
+          'Authorization': getBasicAuthHeader(),
+          'Accept': 'application/json'
         }
       }
     );
@@ -95,7 +96,8 @@ app.get('/api/cards', async (req, res) => {
         headers: {
           accept: 'application/json',
           authorization: `Bearer ${accessToken}`,
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36'
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36',
+          'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7'
         }
       }
     );
@@ -106,6 +108,7 @@ app.get('/api/cards', async (req, res) => {
     if (error.response) {
       console.error('Detalhes:', error.response.status, error.response.data);
     }
+
     res.status(500).json({ error: 'Erro ao buscar cartões' });
   }
 });
@@ -115,13 +118,17 @@ app.get('/api/users', async (req, res) => {
   try {
     const accessToken = await getClaraToken();
 
+    console.log('📡 Fazendo GET para:', 'https://public-api.br.clara.com/api/v2/users'); 
+    console.log('🔑 Token usado:', accessToken);
+
     const usersRes = await axios.get(
       'https://public-api.br.clara.com/api/v2/users', 
       {
         headers: {
           accept: 'application/json',
           authorization: `Bearer ${accessToken}`,
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36'
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36',
+          'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7'
         }
       }
     );
